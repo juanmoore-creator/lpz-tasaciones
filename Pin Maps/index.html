@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinMap - Marcador de Imagen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>PinMap</h1>
+                <p>Carga, marca y exporta</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="imageUpload" class="btn btn-primary full-width">
+                        <span>📤 Subir Imagen</span>
+                        <input type="file" id="imageUpload" accept="image/*" hidden>
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <button id="clearPins" class="btn btn-secondary full-width" disabled>
+                        🗑️ Limpiar Pines
+                    </button>
+                    <button id="undoPin" class="btn btn-secondary full-width" disabled>
+                        ↩️ Deshacer útimo
+                    </button>
+                </div>
+
+                <div class="control-group spacer">
+                    <button id="exportImage" class="btn btn-success full-width" disabled>
+                        💾 Exportar Imagen
+                    </button>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <small>1. Sube una imagen<br>2. Haz clic para agregar pines<br>3. Exporta tu resultado</small>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace" id="workspace">
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">🖼️</div>
+                <h2>No hay imagen seleccionada</h2>
+                <p>Sube una imagen para comenzar a marcar puntos</p>
+            </div>
+            
+            <div id="imageContainer" class="image-container hidden">
+                <img id="targetImage" src="" alt="Mapa base">
+                <div id="pinsLayer" class="pins-layer"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
