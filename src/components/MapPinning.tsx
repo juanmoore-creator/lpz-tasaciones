@@ -87,7 +87,7 @@ export function MapPinning({ currentMapUrl, onSave }: MapPinningProps) {
 
             // Draw Pins
             // Logic from Pin Maps app.js
-            const pinRadius = Math.max(naturalWidth, naturalHeight) * 0.025;
+            const pinRadius = Math.max(naturalWidth, naturalHeight) * 0.018;
             const borderWidth = pinRadius * 0.25;
             const fontSize = pinRadius * 1.2;
 
@@ -102,7 +102,7 @@ export function MapPinning({ currentMapUrl, onSave }: MapPinningProps) {
                 // Draw Circle
                 ctx.beginPath();
                 ctx.arc(xPx, yPx, pinRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#ef4444'; // Red
+                ctx.fillStyle = '#3F11B2'; // Red
                 ctx.fill();
                 ctx.lineWidth = borderWidth;
                 ctx.strokeStyle = '#ffffff'; // White
