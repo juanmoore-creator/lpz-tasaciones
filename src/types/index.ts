@@ -21,6 +21,7 @@ export interface PropertyCharacteristics {
     lotDimensions?: string;        // Medidas del lote
     orientation?: string;          // Orientación
     utilities?: string;            // Servicios
+    condition?: string;            // Estado (Excelente, Muy bueno, etc.)
 }
 
 export interface TargetProperty extends PropertyCharacteristics {

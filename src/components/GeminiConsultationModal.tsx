@@ -39,6 +39,11 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
     const [copied, setCopied] = useState(false);
     const [addedIndices, setAddedIndices] = useState<number[]>([]);
 
+    // Form data state
+    const [condition, setCondition] = useState(target.condition || 'Muy bueno');
+    const [lotDimensions, setLotDimensions] = useState(target.lotDimensions || '');
+    const [utilities, setUtilities] = useState<string[]>(target.utilities ? target.utilities.split(',').map(u => u.trim()) : []);
+
     if (!isOpen) return null;
 
     const toggleComparable = (id: string) => {
@@ -47,8 +52,23 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
         );
     };
 
+    const handleUtilityChange = (utility: string) => {
+        setUtilities(prev =>
+            prev.includes(utility)
+                ? prev.filter(u => u !== utility)
+                : [...prev, utility]
+        );
+    };
+
     const generatePrompt = () => {
         const selectedComps = comparables.filter(c => selectedComparables.includes(c.id));
+
+        // Use manually selected comparables if available, otherwise rely on Google Search as per prompt instructions
+        // The user prompt specifically says "ESTRICTAMENTE UTILIZA GOOGLE SEARCH", but we should still provide context if manual comps are selected.
+        // However, the requested prompt format doesn't explicitly ask for manual comps list, but we can append it as context context or keep it separate.
+        // Given the strict instruction "2. Comparables: ESTRICTAMENTE UTILIZA GOOGLE SEARCH...", I will focus on the Target Property data mostly, 
+        // but keep the manual comps context at the end if useful, or omit if it conflicts with the "strictly google search" instruction.
+        // I will keep the manual comps context as "Referencia" but prioritize the requested structure.
 
         const compsText = selectedComps.length > 0
             ? selectedComps.map(c =>
@@ -56,59 +76,50 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
             ).join('\n\n')
             : "No se seleccionaron comparables manuales.";
 
-        return `INSTRUCCIONES DE SISTEMA PARA ESTE CHAT
+        const utilitiesStr = utilities.join(', ');
 
-Actúa como un Senior Real Estate Appraiser experto en el mercado inmobiliario de La Plata y zona norte. Tu misión es realizar una tasación técnica de alta precisión integrando factores de micro-entorno, normativa urbana (COUT) y variables de mercado locales.
+        return `ACTÚA COMO UN SENIOR REAL ESTATE APPRAISER (La Plata/Zona Norte).
+            PROPIEDAD A TASAR:
+            - Dirección: ${target.address}
+            - Lote: ${lotDimensions || 'No especificado'}
+            - Superficies: Cub ${target.coveredSurface || 0}m2, Semicub ${target.semiCoveredSurface || 0}m2, Desc ${target.uncoveredSurface || 0}m2.
+            - Estado: ${condition} | Servicios: ${utilitiesStr || 'No especificados'}
 
-PROTOCOLO TÉCNICO OBLIGATORIO:
+            PROTOCOLO TÉCNICO:
+            1. Superficie Equivalente (Se): Cubiertos + (Semicub * 0.25) + (Desc * 0.5).
+            2. Comparables: ESTRICTAMENTE UTILIZA GOOGLE SEARCH para encontrar 5 propiedades REALES Y VIGENTES en venta en un radio de <800m. DEBES INCLUIR LA URL DE CADA PROPIEDAD.
+            3. Aplicar prima de 10-15% si está frente a plazas (Paso, Moreno, Malvinas, etc).
+            4. Ajuste de cierre: 7-10% sobre lista.
+            5. Evaluar potencial COUT (FOS/FOT) según zona.
 
-1. BÚSQUEDA WEB Y VERIFICACIÓN (CRÍTICO):
-   * Utiliza Google Search para localizar exactamente 5 comparables reales y VIGENTES en un radio < 800m.
-   * VALIDACIÓN DE FUENTE: Debes indicar obligatoriamente el portal de origen (Zonaprop, Argenprop, etc.) y el nombre de la inmobiliaria o anunciante.
-   * PREVENCIÓN DE ALUCINACIONES: No generes links basados en patrones. Si no encuentras el link directo exacto, proporciona el link a la página de resultados del portal para esa zona específica y describe la propiedad con precisión para su búsqueda manual.
+            IMPORTANTE: FORMATO DE SALIDA JSON
+            Tu respuesta DEBE ser un objeto JSON válido con la siguiente estructura exacta. NO agregues texto fuera del JSON.
 
-2. MICRO-ENTORNO Y NORMATIVA:
-   * Evalúa la cercanía a Plazas (prima de 10-15%) y nodos de actividad (Facultades).
-   * Considera la normativa local COUT (FOS/FOT) y zonificación.
-   * Atributos Físicos: Aplica Superficie Equivalente (Cubierto 100%, Descubierto 50%, Semicubierto 25%).
-   * Servicios: Penaliza un 20% si no posee gas natural en zonas periféricas.
+            {
+              "report": "Aquí va el informe técnico completo en formato Markdown siguiendo el orden del protocolo...",
+              "foundComparables": [
+                 {
+                   "address": "Dirección completa",
+                   "price": 0,
+                   "coveredSurface": 0,
+                   "uncoveredSurface": 0,
+                   "daysOnMarket": 0,
+                   "rooms": 0,
+                   "bedrooms": 0,
+                   "bathrooms": 0,
+                   "age": 0,
+                   "garage": false,
+                   "source": "Nombre del Portal (Ej: Zonaprop)",
+                   "agency": "Nombre de la Inmobiliaria",
+                   "url": "Link real verificado"
+                 }
+              ]
+            }
 
-IMPORTANTE: FORMATO DE SALIDA JSON
-Tu respuesta DEBE ser un objeto JSON válido con la siguiente estructura exacta. NO agregues texto fuera del JSON.
-
-{
-  "report": "Aquí va el informe técnico completo en formato Markdown (usa encabezados, negritas y listas para mejor legibilidad)...",
-  "foundComparables": [
-     {
-       "address": "Dirección completa",
-       "price": 0,
-       "coveredSurface": 0,
-       "uncoveredSurface": 0,
-       "daysOnMarket": 0,
-       "rooms": 0,
-       "bedrooms": 0,
-       "bathrooms": 0,
-       "age": 0,
-       "garage": false,
-       "source": "Nombre del Portal (Ej: Zonaprop)",
-       "agency": "Nombre de la Inmobiliaria",
-       "url": "Link real verificado o link a la búsqueda del portal si el directo falla"
-     }
-  ]
-}
-
-DATOS DE LA PROPIEDAD A TASAR (SUJETO):
-Dirección: ${target.address || 'No especificada'}
-Superficie: ${target.coveredSurface || 0} m² Cubiertos / ${target.semiCoveredSurface || 0} m² Semicubiertos / ${target.uncoveredSurface || 0} m² Descubiertos
-Lote: ${target.lotDimensions || 'No especificadas'}
-Antigüedad: ${target.age || 0} años.
-Orientación: ${target.orientation || 'No especificada'}
-Servicios: ${target.utilities || 'No especificados'}
-
-COMPARABLES MANUALES (CONTEXTO):
-${compsText}
-
-INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los datos de mercado y la ubicación geográfica exacta.`;
+            INFORME FINAL: Entrega valor de mercado sugerido y análisis constructivo.
+            
+            ADJUNTO COMPARABLES MANUALES DE REFERENCIA (SI FUERON SELECCIONADOS):
+            ${compsText}`;
     };
 
     const handleConsult = async () => {
@@ -136,9 +147,6 @@ INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los dato
                         parts: [{ text: prompt }]
                     }],
                     tools: [{ "google_search": {} }], // Activamos la búsqueda de Google
-                    // generationConfig: {
-                    //     responseMimeType: "application/json"
-                    // }
                 })
             });
 
@@ -225,6 +233,53 @@ INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los dato
 
                     {/* Left: Controls */}
                     <div className="lg:col-span-1 space-y-6">
+
+                        {/* New Fields Section */}
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">Estado de conservación</label>
+                                <select
+                                    value={condition}
+                                    onChange={(e) => setCondition(e.target.value)}
+                                    className="w-full text-sm p-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                >
+                                    <option value="Excelente">Excelente</option>
+                                    <option value="Muy bueno">Muy bueno</option>
+                                    <option value="Bueno">Bueno</option>
+                                    <option value="A refaccionar">A refaccionar</option>
+                                    <option value="Demolición">Demolición</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">Tamaño del Lote</label>
+                                <input
+                                    type="text"
+                                    value={lotDimensions}
+                                    onChange={(e) => setLotDimensions(e.target.value)}
+                                    placeholder="Ej: 10x30"
+                                    className="w-full text-sm p-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-2">Servicios</label>
+                                <div className="space-y-2">
+                                    {['Gas natural', 'Cloacas', 'Agua corriente'].map((svc) => (
+                                        <label key={svc} className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={utilities.includes(svc)}
+                                                onChange={() => handleUtilityChange(svc)}
+                                                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                                            />
+                                            <span className="text-sm text-slate-600">{svc}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                             <h4 className="font-semibold text-slate-700 mb-3 flex items-center gap-2 text-sm">
                                 <CheckSquare className="w-4 h-4 text-slate-400" />
