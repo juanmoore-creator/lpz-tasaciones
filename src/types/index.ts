@@ -18,6 +18,9 @@ export interface PropertyCharacteristics {
     hasFinancing?: boolean;        // Ofrece financiamiento
     images?: string[];             // URLs de imagenes
     mapImage?: string;             // URL de imagen del mapa con pines
+    lotDimensions?: string;        // Medidas del lote
+    orientation?: string;          // Orientación
+    utilities?: string;            // Servicios
 }
 
 export interface TargetProperty extends PropertyCharacteristics {
