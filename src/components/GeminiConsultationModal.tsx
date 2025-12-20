@@ -136,9 +136,9 @@ INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los dato
                         parts: [{ text: prompt }]
                     }],
                     tools: [{ "google_search": {} }], // Activamos la búsqueda de Google
-                    generationConfig: {
-                        responseMimeType: "application/json"
-                    }
+                    // generationConfig: {
+                    //     responseMimeType: "application/json"
+                    // }
                 })
             });
 
