@@ -312,7 +312,7 @@ INICIO DEL ANÁLISIS: Genera el JSON con el informe técnico y los comparables e
                                                             <div className="font-medium text-slate-800 text-sm">{comp.address}</div>
                                                             {comp.url && (
                                                                 <a
-                                                                    href={comp.url}
+                                                                    href={comp.url?.startsWith('http') ? comp.url : `https://${comp.url}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
                                                                     className="text-indigo-500 hover:text-indigo-700 hover:underline text-[10px] flex items-center gap-0.5"
