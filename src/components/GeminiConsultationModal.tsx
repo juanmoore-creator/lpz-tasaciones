@@ -78,48 +78,18 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
 
         const utilitiesStr = utilities.join(', ');
 
-        return `ACTÚA COMO UN SENIOR REAL ESTATE APPRAISER (La Plata/Zona Norte).
-            PROPIEDAD A TASAR:
+        return `REALIZAR TASACIÓN PARA LA SIGUIENTE PROPIEDAD:
             - Dirección: ${target.address}
             - Lote: ${lotDimensions || 'No especificado'}
             - Superficies: Cub ${target.coveredSurface || 0}m2, Semicub ${target.semiCoveredSurface || 0}m2, Desc ${target.uncoveredSurface || 0}m2.
             - Estado: ${condition} | Servicios: ${utilitiesStr || 'No especificados'}
+            - Antigüedad: ${target.age || 0} años.
 
-            PROTOCOLO TÉCNICO:
-            1. Superficie Equivalente (Se): Cubiertos + (Semicub * 0.25) + (Desc * 0.5).
-            2. Comparables: ESTRICTAMENTE UTILIZA GOOGLE SEARCH para encontrar 5 propiedades REALES Y VIGENTES en venta en un radio de <800m. DEBES INCLUIR LA URL DE CADA PROPIEDAD.
-            3. Aplicar prima de 10-15% si está frente a plazas (Paso, Moreno, Malvinas, etc).
-            4. Ajuste de cierre: 7-10% sobre lista.
-            5. Evaluar potencial COUT (FOS/FOT) según zona.
+            COMPARABLES MANUALES DE REFERENCIA (SI FUERON SELECCIONADOS):
+            ${compsText}
 
-            IMPORTANTE: FORMATO DE SALIDA JSON
-            Tu respuesta DEBE ser un objeto JSON válido con la siguiente estructura exacta. NO agregues texto fuera del JSON.
-
-            {
-              "report": "Aquí va el informe técnico completo en formato Markdown siguiendo el orden del protocolo...",
-              "foundComparables": [
-                 {
-                   "address": "Dirección completa",
-                   "price": 0,
-                   "coveredSurface": 0,
-                   "uncoveredSurface": 0,
-                   "daysOnMarket": 0,
-                   "rooms": 0,
-                   "bedrooms": 0,
-                   "bathrooms": 0,
-                   "age": 0,
-                   "garage": false,
-                   "source": "Nombre del Portal (Ej: Zonaprop)",
-                   "agency": "Nombre de la Inmobiliaria",
-                   "url": "Link real verificado"
-                 }
-              ]
-            }
-
-            INFORME FINAL: Entrega valor de mercado sugerido y análisis constructivo.
-            
-            ADJUNTO COMPARABLES MANUALES DE REFERENCIA (SI FUERON SELECCIONADOS):
-            ${compsText}`;
+            INSTRUCCIÓN FINAL:
+            Genera el JSON de tasación basado en el System Instruction provisto. Utiliza Google Search para los comparables de mercado.`;
     };
 
     const handleConsult = async () => {
@@ -135,7 +105,44 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
                 throw new Error("API Key no disponible.");
             }
 
-            const prompt = generatePrompt();
+            const systemInstruction = `ACTÚA COMO UN SENIOR REAL ESTATE APPRAISER (La Plata/Zona Norte). Tu misión es realizar una tasación técnica de alta precisión.
+
+PROTOCOLO TÉCNICO OBLIGATORIO:
+1. BÚSQUEDA WEB Y VERIFICACIÓN (CRÍTICO):
+   * Utiliza Google Search para localizar exactamente 5 comparables reales y VIGENTES en un radio < 800m.
+   * VALIDACIÓN DE FUENTE: Debes indicar obligatoriamente el portal de origen y el nombre de la inmobiliaria.
+   * PREVENCIÓN DE ALUCINACIONES: No generes links inventados.
+
+2. MICRO-ENTORNO Y NORMATIVA:
+   * Evalúa cercanía a Plazas y nodos de actividad.
+   * Considera normativa COUT (FOS/FOT).
+   * Servicios: Penaliza si falta gas natural.
+
+IMPORTANTE: FORMATO DE SALIDA JSON
+Tu respuesta DEBE ser SOLAMENTE un objeto JSON válido con la siguiente estructura. NO incluyas markdown (nada de \`\`\`json).
+
+{
+  "report": "Informe técnico completo en Markdown...",
+  "foundComparables": [
+     {
+       "address": "Dirección",
+       "price": 0,
+       "coveredSurface": 0,
+       "uncoveredSurface": 0,
+       "daysOnMarket": 0,
+       "rooms": 0,
+       "bedrooms": 0,
+       "bathrooms": 0,
+       "age": 0,
+       "garage": false,
+       "source": "Portal",
+       "agency": "Inmobiliaria",
+       "url": "URL verificada"
+     }
+  ]
+}`;
+
+            const userPrompt = generatePrompt();
 
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                 method: 'POST',
@@ -143,10 +150,13 @@ export function GeminiConsultationModal({ isOpen, onClose, target, comparables, 
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    systemInstruction: {
+                        parts: [{ text: systemInstruction }]
+                    },
                     contents: [{
-                        parts: [{ text: prompt }]
+                        parts: [{ text: userPrompt }]
                     }],
-                    tools: [{ "google_search": {} }], // Activamos la búsqueda de Google
+                    tools: [{ "google_search": {} }]
                 })
             });
 
