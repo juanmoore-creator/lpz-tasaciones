@@ -136,13 +136,22 @@ INICIO DEL ANÁLISIS: Genera el JSON con el informe técnico y los comparables e
 
             if (!textResponse) throw new Error("No se recibió respuesta.");
 
+            // Limpiar la respuesta de bloques de código markdown si existen
+            let cleanText = textResponse.trim();
+            if (cleanText.startsWith('```json')) {
+                cleanText = cleanText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+            } else if (cleanText.startsWith('```')) {
+                cleanText = cleanText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+            }
+
             // Parse JSON
             try {
-                const parsed = JSON.parse(textResponse) as GeminiResponse;
+                const parsed = JSON.parse(cleanText) as GeminiResponse;
                 setParsedData(parsed);
                 setResponse(parsed.report); // Fallback for copy
             } catch (e) {
                 console.error("JSON Parse Error", e);
+                console.log("Raw text:", textResponse);
                 setResponse(textResponse); // Fallback to raw text if not JSON
             }
 
