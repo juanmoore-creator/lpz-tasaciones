@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       {
         name: 'configure-server',
         configureServer(server) {
-          server.middlewares.use('/api/imagekit-auth', (req, res, next) => {
+          server.middlewares.use('/api/imagekit-auth', (_req, res, _next) => {
             try {
               const privateKey = env.IMAGEKIT_PRIVATE_KEY || env.VITE_IMAGEKIT_PRIVATE_KEY;
               const publicKey = env.VITE_IMAGEKIT_PUBLIC_KEY || env.IMAGEKIT_PUBLIC_KEY;

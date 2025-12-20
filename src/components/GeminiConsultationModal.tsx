@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Bot, Sparkles, CheckSquare, Square, Loader2, Copy, Check, Plus, AlertTriangle } from 'lucide-react';
+import { X, Bot, Sparkles, CheckSquare, Square, Loader2, Copy, Check, Plus } from 'lucide-react';
 import type { TargetProperty, Comparable } from '../types';
 
 interface GeminiConsultationModalProps {
