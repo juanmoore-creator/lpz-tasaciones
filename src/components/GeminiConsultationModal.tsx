@@ -118,7 +118,7 @@ INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los dato
         setAddedIndices([]);
 
         try {
-            const apiKey = ""; // La clave se proporciona en el entorno
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY; // La clave se proporciona en el entorno
             if (!apiKey) {
                 // Para pruebas locales sin la clave de entorno inyectada
                 throw new Error("API Key no disponible.");
