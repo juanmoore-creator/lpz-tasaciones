@@ -87,7 +87,7 @@ export function MapPinning({ currentMapUrl, onSave }: MapPinningProps) {
 
             // Draw Pins
             // Logic from Pin Maps app.js
-            const pinRadius = Math.max(naturalWidth, naturalHeight) * 0.012;
+            const pinRadius = Math.max(naturalWidth, naturalHeight) * 0.025;
             const borderWidth = pinRadius * 0.25;
             const fontSize = pinRadius * 1.2;
 
@@ -211,13 +211,13 @@ export function MapPinning({ currentMapUrl, onSave }: MapPinningProps) {
                                     {/* Pins Overlay */}
                                     <div className="absolute inset-0 pointer-events-none">
                                         {pins.map((pin, i) => (
-                                            <div
-                                                key={i}
-                                                className="absolute w-6 h-6 -ml-3 -mt-3 bg-red-500 border-2 border-white rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-sm"
-                                                style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-                                            >
-                                                {i + 1}
-                                            </div>
+                                   <div
+                                       key={i}
+                                       className="absolute w-7 h-7 -ml-[14px] -mt-[14px] bg-[#3F11B2] border-2 border-white rounded-full flex items-center justify-center text-white text-[11px] font-bold shadow-md"
+                                       style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+                                   >
+                                       {i + 1}
+                                   </div>
                                         ))}
                                     </div>
                                 </div>
