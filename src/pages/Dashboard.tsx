@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import {
   Upload, Home, Trash2, Plus, AlertCircle, FileSpreadsheet, Save, FolderOpen, X, FileText,
-  Pencil, ChevronDown, ChevronUp, CheckSquare, BarChart
+  Pencil, ChevronDown, ChevronUp, CheckSquare, BarChart, Sparkles
 } from 'lucide-react';
 import { cn } from '../components/ui/Card'; // Importing helper if needed or just use clsx/tailwind directly
 import { Card } from '../components/ui/Card';
@@ -14,6 +14,7 @@ import { formatCurrency, formatNumber } from '../utils/format';
 import { SURFACE_TYPES, DEFAULT_FACTORS } from '../constants';
 import { ImageUpload } from '../components/ImageUpload';
 import { MapPinning } from '../components/MapPinning';
+import { GeminiConsultationModal } from '../components/GeminiConsultationModal';
 import type { SurfaceType } from '../types/index';
 
 function Dashboard() {
@@ -36,6 +37,7 @@ function Dashboard() {
   // Wait, I didn't add `savedValuationsModalOpen` to hook. I only added the logic.
   // I will add it here.
   const [savedValuationsModalOpen, setSavedValuationsModalOpen] = useState(false);
+  const [geminiModalOpen, setGeminiModalOpen] = useState(false);
   const [editingCompId, setEditingCompId] = useState<string | null>(null);
   const [showOptionalTarget, setShowOptionalTarget] = useState(false);
   const [clientName, setClientName] = useState('');
@@ -80,6 +82,9 @@ function Dashboard() {
           </button>
           <button onClick={() => setSavedValuationsModalOpen(true)} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
             <FolderOpen className="w-4 h-4" /> <span className="hidden sm:inline">Mis Tasaciones</span>
+          </button>
+          <button onClick={() => setGeminiModalOpen(true)} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors border border-indigo-200/50">
+            <Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Consultar IA</span>
           </button>
           <button onClick={handleSaveValuation} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-brand hover:bg-brand-dark rounded-lg transition-colors shadow-sm shadow-brand/20">
             <Save className="w-4 h-4" /> <span className="hidden sm:inline">Guardar</span>
@@ -154,6 +159,14 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      <GeminiConsultationModal
+        isOpen={geminiModalOpen}
+        onClose={() => setGeminiModalOpen(false)}
+        target={target}
+        comparables={comparables}
+        onAddComparable={addComparable}
+      />
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
 
@@ -372,7 +385,7 @@ function Dashboard() {
           <Card className="h-full flex flex-col">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <h3 className="font-semibold text-slate-800 font-heading">Comparables ({comparables.length})</h3>
-              <button onClick={addComparable} className="flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark bg-brand/10 hover:bg-brand/20 px-3 py-1.5 rounded-md transition-colors">
+              <button onClick={() => addComparable()} className="flex items-center gap-1 text-sm font-medium text-brand hover:text-brand-dark bg-brand/10 hover:bg-brand/20 px-3 py-1.5 rounded-md transition-colors">
                 <Plus className="w-4 h-4" /> Agregar
               </button>
             </div>

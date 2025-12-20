@@ -129,7 +129,7 @@ export const useValuation = () => {
         }
     };
 
-    const addComparable = async () => {
+    const addComparable = async (initialData?: Partial<Omit<Comparable, 'id'>>) => {
         const paths = getPaths();
         if (!paths) return; // Strict check
 
@@ -153,7 +153,8 @@ export const useValuation = () => {
             isCreditEligible: false,
             isProfessional: false,
             hasFinancing: false,
-            images: []
+            images: [],
+            ...initialData
         };
         if (user && db) {
             console.log("Adding comparable to:", paths.comparablesPath);
