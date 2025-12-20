@@ -17,7 +17,7 @@ const ReportView = ({ data, properties, valuation, stats, theme }: { data: any, 
                 <PropertyDetailPage key={prop.id || index} property={prop} index={index} theme={theme} />
             ))}
 
-            <PriceSuggestionPage data={valuation} stats={stats} theme={theme} />
+            <PriceSuggestionPage data={valuation} stats={stats} theme={theme} properties={properties} />
             <AveragesPage properties={properties} theme={theme} />
             <ContactPage data={data} theme={theme} />
         </div>

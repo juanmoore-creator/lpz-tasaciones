@@ -1,10 +1,10 @@
 
 
-const PriceSuggestionPage = ({ data, stats, theme }: { data: any, stats: any, theme?: { primary: string, secondary: string } }) => {
+const PriceSuggestionPage = ({ data, stats, properties, theme }: { data: any, stats: any, properties: any[], theme?: { primary: string, secondary: string } }) => {
     // Default colors if theme is not provided
     const primaryColor = theme?.primary || '#1e293b'; // slate-900
     const secondaryColor = theme?.secondary || '#4f46e5'; // indigo-600 used as accent in some places
-
+    const count = properties.length;
     return (
         <div className="print-page h-[1123px] w-[794px] bg-white p-12 flex flex-col items-center">
             {/* Header */}
@@ -60,7 +60,7 @@ const PriceSuggestionPage = ({ data, stats, theme }: { data: any, stats: any, th
             {/* Footer */}
             <div className="mt-auto pt-6 border-t border-slate-100 w-full flex justify-between text-xs text-slate-400">
                 <span>Reporte generado el {new Date().toLocaleDateString()}</span>
-                <span>Página Final</span>
+                <span>Página {count + 4}</span>
             </div>
         </div>
     );
