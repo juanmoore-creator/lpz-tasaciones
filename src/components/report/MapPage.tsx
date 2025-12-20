@@ -9,7 +9,7 @@ const MapPage = ({ properties, theme, mapImage }: { properties: any[], theme?: {
             <h2 className="text-2xl font-bold text-slate-800 mb-6 border-b pb-2" style={{ borderColor: primaryColor }}>Ubicación de Comparables</h2>
             <div className="flex-1 border border-slate-200 rounded-lg flex items-center justify-center bg-slate-50 mb-8 overflow-hidden">
                 {mapImage ? (
-                    <img src={mapImage} alt="Mapa de Ubicación" className="w-full h-full object-none object-top" crossOrigin="anonymous" />
+                    <img src={mapImage} alt="Mapa de Ubicación" className="w-full h-full object-cover" crossOrigin="anonymous" />
                 ) : (
                     <p className="text-slate-400">Mapa de Ubicación (No disponible)</p>
                 )}
