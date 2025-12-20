@@ -1,7 +1,7 @@
 
 const CoverPage = ({ data, theme }: { data: any; theme?: any }) => {
     // Brand Colors
-    const deepNavyBlue = theme?.primary || '#1A2B4C';
+    const deepNavyBlue = '#3F11B2';
     const goldAccent = theme?.secondary || '#C5A059';
 
 
@@ -43,7 +43,7 @@ const CoverPage = ({ data, theme }: { data: any; theme?: any }) => {
                     <div className="mb-24 flex items-center gap-4">
                         <div className="h-px w-12 bg-gray-300"></div>
                         <h2 className="text-xl font-semibold tracking-[0.2em] text-gray-400 uppercase">
-                            Comparables
+                           Basado en comparables
                         </h2>
                     </div>
 
@@ -51,7 +51,7 @@ const CoverPage = ({ data, theme }: { data: any; theme?: any }) => {
                     <div className="mb-16">
                         <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 font-bold flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: goldAccent }}></span>
-                            Propiedad
+                            Propiedad tasada:
                         </p>
                         <p className="text-4xl font-bold text-slate-900 leading-tight">
                             {data.target?.address || 'Dirección de la Propiedad'}
@@ -78,7 +78,7 @@ const CoverPage = ({ data, theme }: { data: any; theme?: any }) => {
                     <div className="mb-24">
                         <p className="text-xs text-gray-500 uppercase tracking-widest mb-3 font-bold flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: goldAccent }}></span>
-                            Preparado para
+                            Cliente:
                         </p>
                         <p className="text-2xl text-slate-800 font-medium">
                             {data.clientName || 'Nombre del Cliente'}
