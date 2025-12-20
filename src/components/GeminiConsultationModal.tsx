@@ -153,7 +153,9 @@ INICIO DEL ANÁLISIS: Genera el JSON técnico. Prioriza la veracidad de los dato
             if (!textResponse) throw new Error("No se recibió respuesta.");
 
             try {
-                const parsed = JSON.parse(textResponse) as GeminiResponse;
+                // Limpiar caracteres de markdown (```json ... ```) si existen
+                const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+                const parsed = JSON.parse(cleanJson) as GeminiResponse;
                 setParsedData(parsed);
                 setResponse(parsed.report);
             } catch (e) {
